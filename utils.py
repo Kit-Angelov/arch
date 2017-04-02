@@ -1,3 +1,7 @@
+"""Слова длиной меньше 3 не берем, слова дной меньше 2 после стеммера тоже не берем
+При наличии большой обучающей выборки создаем второй мешок слов: в одном весь словарный запас, во втором
+ только те слова частота которых больше 1 - его и берем для векторизации.
+ Можно рассмотреть другие стеммеры"""
 import re
 import shelve
 import math
@@ -5,11 +9,15 @@ from collections import Counter
 import numpy as np
 
 
-# удаление чисел и слов длиной меньше 2
+# удаление чисел и слов длиной меньше 3
 def format_word(word_arr):
+    alpha = 'АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЪъЫыЬьЭэЮюЯя'
+    alpha_set = set(list(alpha))
     new_arr = []
     for word in word_arr:
-        if word.isalpha() and len(word) > 1:
+        word_set = set(list(word))
+        compare_set = alpha_set & word_set
+        if word.isalpha() and len(word) > 2 and word_set == compare_set:
             new_arr.append(word)
     return new_arr
 
@@ -46,7 +54,8 @@ def stem_arr(word_arr):
     stem_word_arr = []
     for word in word_arr:
         word = stemming(word)
-        stem_word_arr.append(word)
+        if len(word) > 1:
+            stem_word_arr.append(word)
     return stem_word_arr
 
 
